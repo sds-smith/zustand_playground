@@ -8,15 +8,11 @@ import './App.css'
 
 function App() {
   const root = useStore((state) => state.root)
-  const updateRoot = useStore((state) => state.updateRoot)
+  const fetchRoot = useStore((state) => state.fetchRoot)
 
   useEffect(() => {
-    if (!root) {
-      fetch('https://swapi.dev/api/')
-        .then(response => response.json()
-          .then(jsonResponse => updateRoot(jsonResponse)))
-    } 
-  }, [root, updateRoot])
+    if (!root) fetchRoot();
+  }, [fetchRoot, root])
 
   return (
     <Routes>

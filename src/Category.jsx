@@ -7,8 +7,10 @@ export default function Category() {
     const { category } = useParams();
 
     const root = useStore((state) => state.root);
-    const categoryData = useStore((state) => state[category])
-    const updateCategory = useStore((state) => state.updateCategory);
+    const loading = useStore((state) => state.loading);
+    const error = useStore((state) => state.error);
+    const categoryData = useStore((state) => state[category]);
+    const fetchCategory = useStore((store) => store.fetchCategory);
     const categories = root ? Object.keys(root) : [];
     const paramKeys = categories.map(category => category.slice(0, -1));
 
@@ -18,25 +20,13 @@ export default function Category() {
     const searchParam = searchParams.get(paramKey);
     console.log({searchParam})
 
-    
     const columns = [ 'name', 'title', 'url', ...categories ];
 
     useEffect(() => {
-      const categoryDataArray = [];
-      const fetchCategoryData = async (endpoint) => {
-        const response = await fetch(endpoint)
-        const { results, count, next } = await response.json();
-        categoryDataArray.push(...results)
-        if (count > categoryDataArray.length) {
-          await fetchCategoryData(next)
-        }
-          
+      if (!categoryData && !loading && !error) {
+        fetchCategory(category)
       }
-      if (root && !categoryData) {
-        fetchCategoryData(root[category])
-          .then(() => updateCategory(category, categoryDataArray))
-      }
-    }, [root, category, updateCategory, categoryData])
+    }, [category, categoryData, fetchCategory, loading, error])
 
     useEffect(()=>console.log({categoryData}),[categoryData])
 
