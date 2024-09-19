@@ -1,14 +1,14 @@
 import { useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
-import { useStore } from './store/store'
+import { useStore, selectors } from './store/store'
 import Home from './Home'
 import Category from './Category'
 import './App.css'
 
 
 function App() {
-  const root = useStore((state) => state.root)
-  const fetchRoot = useStore((state) => state.fetchRoot)
+  const root = useStore(selectors.root)
+  const fetchRoot = useStore(selectors.fetchRoot)
 
   useEffect(() => {
     if (!root) fetchRoot();

@@ -1,13 +1,13 @@
-import { useEffect } from 'react';
+
 import { useNavigate } from 'react-router-dom'
-import { useStore } from './store/store'
+import { useStore, selectors } from './store/store'
 
 
 export default function Home() {
-  const root = useStore((state) => state.root)
+  const root = useStore(selectors.root)
 
   const navigate = useNavigate();
-useEffect(()=>console.log({root}),[root])
+
   return (
     <> { root ? (
         <table className='table table-bordered'>

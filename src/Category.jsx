@@ -1,26 +1,25 @@
 import { useEffect } from "react";
 import { useParams, useLocation, useSearchParams, useNavigate } from "react-router-dom";
-import { useStore } from "./store/store";
+import { useStore, selectors } from "./store/store";
 
 export default function Category() {
     const navigate = useNavigate();
     const { category } = useParams();
 
-    const root = useStore((state) => state.root);
-    const loading = useStore((state) => state.loading);
-    const error = useStore((state) => state.error);
-    const categoryData = useStore((state) => state[category]);
-    const fetchCategory = useStore((store) => store.fetchCategory);
-    const categories = root ? Object.keys(root) : [];
-    const paramKeys = categories.map(category => category.slice(0, -1));
+    const loading = useStore(selectors.loading);
+    const error = useStore(selectors.error);
+    const categoryData = useStore(selectors.category(category));
+    const fetchCategory = useStore(selectors.fetchCategory);
+    const categories = useStore(selectors.categories);
+    const paramKeys = categories?.map(category => category.slice(0, -1));
 
     const { search } = useLocation();
     const paramKey = paramKeys?.find(key => search.includes(key));
     const [ searchParams ] = useSearchParams();
     const searchParam = searchParams.get(paramKey);
-    console.log({searchParam})
-
+    const filter = useStore(selectors.categoryItemByName(`${paramKey}s`, searchParam))
     const columns = [ 'name', 'title', 'url', ...categories ];
+    const filteredCategoryData = filter ? categoryData?.filter(item => filter[category].includes(item.url)) : categoryData
 
     useEffect(() => {
       if (!categoryData && !loading && !error) {
@@ -28,14 +27,12 @@ export default function Category() {
       }
     }, [category, categoryData, fetchCategory, loading, error])
 
-    useEffect(()=>console.log({categoryData}),[categoryData])
-
   return (
-        <> { categoryData ? (
+        <> { filteredCategoryData ? (
         <table className='table table-bordered'>
           <thead className='table-dark'>
             <tr >
-                {Object.keys(categoryData[0])
+                {Object.keys(filteredCategoryData[0])
                 .filter(column => columns.includes(column))
                 .map(key => (
                     <th key={key} scope='row'>{key}</th>
@@ -43,7 +40,7 @@ export default function Category() {
             </tr>
           </thead>
           <tbody>
-            { categoryData
+            { filteredCategoryData
             .map((row) => (
               <tr key={row.url}  >
                 {Object.keys(row)

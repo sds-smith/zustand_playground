@@ -5,6 +5,7 @@ export const useStore = create((set) => ({
   loading: false,
   error: null,
   root: null,
+  categories: null,
   people: null,
   planets: null,
   films: null,
@@ -23,6 +24,7 @@ export const useStore = create((set) => ({
     try {
       const root = await httpFetchRoot();
       set({ root })
+      set({ categories: Object.keys(root)})
     } catch(err) {
       set({ error: err.message})
     } finally {
@@ -42,3 +44,14 @@ export const useStore = create((set) => ({
     }
   },
 }))
+
+export const selectors = {
+  loading: store => store.loading,
+  error: store => store.error,
+  root: store => store.root,
+  categories: store => store.categories,
+  category: category => store => store[category],
+  categoryItemByName: (category, name) => store => store[category]?.find(item => item.name === name || item.title === name),
+  fetchRoot: store => store.fetchRoot,
+  fetchCategory: store => store.fetchCategory,
+}
